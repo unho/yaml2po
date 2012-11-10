@@ -1,0 +1,98 @@
+#!/usr/bin/env ruby
+#
+# Quiteino de http://git.openstreetmap.org/rails.git/tree/HEAD:/script/locale e
+# cambiei parte do código para adaptalo ás miñas necesidades.
+#
+#
+# TODO arranxar o problema de que non escapa os " que aparecen polo medio da cadea
+# TODO arranxar o problema de que non escapa os \ que aparecen polo medio da cadea
+# TODO arranxar o problema de que non indica correctamente as cadeas que ocupan varias liñas
+#
+# yaml2po, for converting RoR translation YAML to the standard gettext
+#          for eventual use with a translation site such as Transifex
+# Use:
+#  - To create a 'master' .pot
+#    yaml2po > translations.pot
+#
+#  - To create a language's .po (includes from scratch)
+#    yaml2po de > de.po
+
+require "yaml"
+require "optparse"
+
+# Aquí indícase o prefixo co que comeza o ficheiro por exemplo '/diaspora.' para
+# o ficheiro diaspora.en.yml ou diaspora.gl.yml
+FILE_PREFIX = '/'
+
+LOCALE_DIR = File.dirname(__FILE__)
+EN = YAML::load_file(LOCALE_DIR+FILE_PREFIX+'en.yml')
+
+
+def iterate(hash, fhash={}, path='', outfile=$stdout)
+    postr = ''
+    hash.each {|key, val|
+    fhash[key] = {} unless fhash.has_key? key
+    if val.is_a? Hash
+        fhash[key] = {} unless fhash[key].is_a? Hash
+        iterate(val, fhash[key], path+key+':', outfile)
+    else
+        puts ''
+        outfile.puts "msgctxt \"#{path}#{key}\""
+        outfile.puts "msgid \"#{val}\""
+        outfile.puts "msgstr \"#{fhash[key]}\""
+    end
+    }
+end
+
+
+def print_header(lang='LANGUAGE')
+    puts '# SOME DESCRIPTIVE TITLE.'
+    puts '# Copyright (C) YEAR THE PACKAGE\'S COPYRIGHT HOLDER'
+    puts '# This file is distributed under the same license as the PACKAGE package.'
+    puts '# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.'
+    puts '#'
+    if lang == 'LANGUAGE'
+        puts '#, fuzzy'
+    end
+    puts 'msgid ""'
+    puts 'msgstr ""'
+    puts '"Project-Id-Version: PACKAGE VERSION\n"'
+    puts '"Report-Msgid-Bugs-To: \n"'
+    puts '"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"'
+    puts '"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"'
+    puts '"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"'
+    puts '"Language-Team: ' + lang + ' <LL@li.org>\n"'
+    puts '"MIME-Version: 1.0\n"'
+    puts '"Content-Type: text/plain; charset=UTF-8\n"'
+    puts '"Content-Transfer-Encoding: 8bit\n"'
+    puts '"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"'
+end
+
+
+def lang2po(lang, outfile=$stdout)
+    oth = {}
+    infile = LOCALE_DIR+FILE_PREFIX+lang+'.yml'
+    if File.exists? infile
+        oth = YAML::load_file(infile)
+        oth = oth[lang]
+        print_header(lang)
+        iterate(EN['en'], oth, '', outfile)
+    else
+        $stderr.puts("\nError: Specified PO file does not exist.\n\n")
+    end
+end
+
+
+
+opt = ARGV[0]
+
+if opt
+    # Entra por aquí cando xera un ficheiro PO con tradución para un idioma dado
+    lang2po(opt)
+else
+    # Entra por aquí cando xera o ficheiro POT
+    print_header()
+    iterate(EN['en'])
+end
+
+
