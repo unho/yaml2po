@@ -37,6 +37,18 @@ require "optparse"
 LOCALE_DIR = File.dirname(__FILE__) + '/'
 
 
+def process_msgid_msgstr(string)
+    # Escape the " characters and correctly output multiline strings both in msgid and msgstr
+    if string.is_a? Hash
+        new_string = ''
+    else
+        new_string = string.gsub("\"", "\\\"")
+        new_string = new_string.gsub("\n", "\"\n\"")
+    end
+    return new_string
+end
+
+
 def iterate(hash, fhash={}, path='', outfile=$stdout)
     postr = ''
     hash.each {|key, val|
@@ -47,11 +59,10 @@ def iterate(hash, fhash={}, path='', outfile=$stdout)
     else
         outfile.puts("")
         outfile.puts("msgctxt \"#{path}#{key}\"")
-        # TODO make it to escape the " characters both in msgid and msgstr
-        # TODO make it to escape the \ characters which are not escaping other characters both in msgid and msgstr
-        # TODO make it to correctly output multiline strings both in msgid and msgstr
-        outfile.puts("msgid \"#{val}\"")
-        outfile.puts("msgstr \"#{fhash[key]}\"")
+        new_source = process_msgid_msgstr(val)
+        outfile.puts("msgid \"#{new_source}\"")
+        new_translation = process_msgid_msgstr(fhash[key])
+        outfile.puts("msgstr \"#{new_translation}\"")
     end
     }
 end
