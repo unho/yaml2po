@@ -84,6 +84,20 @@ def print_header(lang='LANGUAGE', outfile=$stdout)
 end
 
 
+def generate_pot(sourcefile, outfilename)
+    engfile = LOCALE_DIR+sourcefile
+    if File.exists? engfile
+        eng = YAML::load_file(engfile)
+        outfile = File.new(outfilename, "w")
+        print_header('', outfile)
+        iterate(eng['en'], {}, '', outfile)
+        outfile.close()
+    else
+        $stderr.puts("\nError: Specified YAML file \"#{sourcefile}\" does not exist.\n\n")
+    end
+end
+
+
 def lang2po(lang, sourcefile, langfile, outfilename)
     engfile = LOCALE_DIR+sourcefile
     if File.exists? engfile
@@ -106,20 +120,6 @@ def lang2po(lang, sourcefile, langfile, outfilename)
 end
 
 
-def generate_pot(sourcefile, outfilename)
-    engfile = LOCALE_DIR+sourcefile
-    if File.exists? engfile
-        eng = YAML::load_file(engfile)
-        outfile = File.new(outfilename, "w")
-        print_header('', outfile)
-        iterate(eng['en'], {}, '', outfile)
-        outfile.close()
-    else
-        $stderr.puts("\nError: Specified YAML file \"#{sourcefile}\" does not exist.\n\n")
-    end
-end
-
-
 def print_usage()
     $stderr.puts("\nUsage:\n")
     $stderr.puts("  - To create a 'master' .pot\n")
@@ -133,19 +133,20 @@ end
 
 opt = ARGV[0]
 
-if opt == '-l'
-    # Goes this way when generating a PO file with the translation for a given language
-    if (ARGV.size == 6)
-        lang2po(ARGV[1], ARGV[3], ARGV[4], LOCALE_DIR+ARGV[5])
-        exit
-    end
-elsif opt == '-P'
+if opt == '-P'
     # Goes this way when generating a POT file
     if (ARGV.size == 3)
         generate_pot(ARGV[1], LOCALE_DIR+ARGV[2])
         exit
     end
+elsif opt == '-l'
+    # Goes this way when generating a PO file with the translation for a given language
+    if (ARGV.size == 6)
+        lang2po(ARGV[1], ARGV[3], ARGV[4], LOCALE_DIR+ARGV[5])
+        exit
+    end
 end
+
 print_usage()
 
 
