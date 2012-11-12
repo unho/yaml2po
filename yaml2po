@@ -132,12 +132,12 @@ end
 
 
 def print_usage()
-    $stderr.puts("\nUsage:\n")
-    $stderr.puts("  - To create a 'master' .pot\n")
-    $stderr.puts("    yaml2po -P en.yml file.pot\n")
-    $stderr.puts("\n")
-    $stderr.puts("  - To create a language's .po\n")
-    $stderr.puts("    yaml2po -l de -t en.yml de.yml de.po\n\n")
+    puts("\nUsage:\n")
+    puts("  - To create a 'master' .pot\n")
+    puts("    yaml2po -P en.yml file.pot\n")
+    puts("\n")
+    puts("  - To create a language's .po\n")
+    puts("    yaml2po -l de -t en.yml de.yml de.po\n\n")
 end
 
 
