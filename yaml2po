@@ -45,46 +45,46 @@ def iterate(hash, fhash={}, path='', outfile=$stdout)
         fhash[key] = {} unless fhash[key].is_a? Hash
         iterate(val, fhash[key], path+key+':', outfile)
     else
-        outfile.puts ""
-        outfile.puts "msgctxt \"#{path}#{key}\""
+        outfile.puts("")
+        outfile.puts("msgctxt \"#{path}#{key}\"")
         # TODO make it to escape the " characters both in msgid and msgstr
         # TODO make it to escape the \ characters which are not escaping other characters both in msgid and msgstr
         # TODO make it to correctly output multiline strings both in msgid and msgstr
-        outfile.puts "msgid \"#{val}\""
-        outfile.puts "msgstr \"#{fhash[key]}\""
+        outfile.puts("msgid \"#{val}\"")
+        outfile.puts("msgstr \"#{fhash[key]}\"")
     end
     }
 end
 
 
 def print_header(lang='LANGUAGE', outfile=$stdout)
-    outfile.puts '# SOME DESCRIPTIVE TITLE.'
-    outfile.puts '# Copyright (C) YEAR THE PACKAGE\'S COPYRIGHT HOLDER'
-    outfile.puts '# This file is distributed under the same license as the PACKAGE package.'
-    outfile.puts '# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.'
-    outfile.puts '#'
+    outfile.puts('# SOME DESCRIPTIVE TITLE.')
+    outfile.puts('# Copyright (C) YEAR THE PACKAGE\'S COPYRIGHT HOLDER')
+    outfile.puts('# This file is distributed under the same license as the PACKAGE package.')
+    outfile.puts('# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.')
+    outfile.puts('#')
     if lang == 'LANGUAGE'
-        outfile.puts '#, fuzzy'
+        outfile.puts('#, fuzzy')
     end
-    outfile.puts 'msgid ""'
-    outfile.puts 'msgstr ""'
-    outfile.puts '"Project-Id-Version: PACKAGE VERSION\n"'
-    outfile.puts '"Report-Msgid-Bugs-To: \n"'
+    outfile.puts('msgid ""')
+    outfile.puts('msgstr ""')
+    outfile.puts('"Project-Id-Version: PACKAGE VERSION\n"')
+    outfile.puts('"Report-Msgid-Bugs-To: \n"')
     # TODO put today's date
-    outfile.puts '"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"'
+    outfile.puts('"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"')
     # TODO if it is no POT file, put today's date
-    outfile.puts '"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"'
-    outfile.puts '"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"'
-    outfile.puts '"Language-Team: ' + lang + ' <LL@li.org>\n"'
-    outfile.puts '"MIME-Version: 1.0\n"'
-    outfile.puts '"Content-Type: text/plain; charset=UTF-8\n"'
-    outfile.puts '"Content-Transfer-Encoding: 8bit\n"'
+    outfile.puts('"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"')
+    outfile.puts('"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"')
+    outfile.puts('"Language-Team: ' + lang + ' <LL@li.org>\n"')
+    outfile.puts('"MIME-Version: 1.0\n"')
+    outfile.puts('"Content-Type: text/plain; charset=UTF-8\n"')
+    outfile.puts('"Content-Transfer-Encoding: 8bit\n"')
     # TODO if it is no POT file, put the corresponding plural string for the given language code
-    outfile.puts '"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"'
+    outfile.puts('"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"')
 end
 
 
-def lang2po(lang, sourcefile, langfile, outfile=$stdout)
+def lang2po(lang, sourcefile, langfile, outfile)
     engfile = LOCALE_DIR+sourcefile
     if File.exists? engfile
         infile = LOCALE_DIR+langfile
@@ -93,8 +93,9 @@ def lang2po(lang, sourcefile, langfile, outfile=$stdout)
             eng = YAML::load_file(engfile)
             oth = YAML::load_file(infile)
             oth = oth[lang]
-            print_header(lang)
+            print_header(lang, outfile)
             iterate(eng['en'], oth, '', outfile)
+            outfile.close()
         else
             $stderr.puts("\nError: Specified YAML file \"#{infile}\" does not exist.\n\n")
         end
@@ -104,12 +105,13 @@ def lang2po(lang, sourcefile, langfile, outfile=$stdout)
 end
 
 
-def generate_pot(sourcefile, outfile=$stdout)
+def generate_pot(sourcefile, outfile)
     engfile = LOCALE_DIR+sourcefile
     if File.exists? engfile
         eng = YAML::load_file(engfile)
-        print_header()
+        print_header('', outfile)
         iterate(eng['en'], {}, '', outfile)
+        outfile.close()
     else
         $stderr.puts("\nError: Specified YAML file \"#{sourcefile}\" does not exist.\n\n")
     end
@@ -119,10 +121,10 @@ end
 def print_usage()
     $stderr.puts("\nUsage:\n")
     $stderr.puts("  - To create a 'master' .pot\n")
-    $stderr.puts("    yaml2po -P en.yml > translations.pot\n")
+    $stderr.puts("    yaml2po -P en.yml file.pot\n")
     $stderr.puts("\n")
     $stderr.puts("  - To create a language's .po\n")
-    $stderr.puts("    yaml2po -l de -t en.yml de.yml > de.po\n\n")
+    $stderr.puts("    yaml2po -l de -t en.yml de.yml de.po\n\n")
 end
 
 
@@ -131,18 +133,20 @@ opt = ARGV[0]
 
 if opt == '-l'
     # Goes this way when generating a PO file with the translation for a given language
-    # TODO check if ARGV[1] exists
-    # TODO check if ARGV[3] exists
-    # TODO check if ARGV[4] exists
-    # TODO allow to specify -o option and an outfile to output to
-    lang2po(ARGV[1], ARGV[3], ARGV[4])
+    if (ARGV.size == 6)
+        outfile = File.new(LOCALE_DIR+ARGV[5], "w")
+        lang2po(ARGV[1], ARGV[3], ARGV[4], outfile)
+        exit
+    end
 elsif opt == '-P'
     # Goes this way when generating a POT file
-    # TODO check if ARGV[1] exists
-    # TODO allow to specify -o option and an outfile to output to
-    generate_pot(ARGV[1])
-else
-    print_usage()
+    if (ARGV.size == 3)
+        outfile = File.new(LOCALE_DIR+ARGV[2], "w")
+        generate_pot(ARGV[1], outfile)
+        exit
+    end
 end
+print_usage()
+
 
 
