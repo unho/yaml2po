@@ -53,13 +53,16 @@ def print_header(lang='LANGUAGE', outfile=$stdout)
     outfile.puts 'msgstr ""'
     outfile.puts '"Project-Id-Version: PACKAGE VERSION\n"'
     outfile.puts '"Report-Msgid-Bugs-To: \n"'
+    # TODO put today's date
     outfile.puts '"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"'
+    # TODO if it is no POT file, put today's date
     outfile.puts '"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"'
     outfile.puts '"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"'
     outfile.puts '"Language-Team: ' + lang + ' <LL@li.org>\n"'
     outfile.puts '"MIME-Version: 1.0\n"'
     outfile.puts '"Content-Type: text/plain; charset=UTF-8\n"'
     outfile.puts '"Content-Transfer-Encoding: 8bit\n"'
+    # TODO if it is no POT file, put the corresponding plural string for the given language code
     outfile.puts '"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"'
 end
 
