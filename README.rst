@@ -20,4 +20,10 @@ Usage mode
     -l option indicates the language code in the YAML translation file
     
     -t option indicates the template YAML file (the english translation one)
-    
+
+License
+-------
+
+This software is licensed under the GNU General Public License 2.0 (http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt), a copy of which can be found in the LICENSE file.
+
+
