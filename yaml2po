@@ -33,6 +33,7 @@
 
 require "yaml"
 require "optparse"
+require "time"
 
 LOCALE_DIR = File.dirname(__FILE__) + '/'
 
@@ -81,10 +82,13 @@ def print_header(lang='LANGUAGE', outfile=$stdout)
     outfile.puts('msgstr ""')
     outfile.puts('"Project-Id-Version: PACKAGE VERSION\n"')
     outfile.puts('"Report-Msgid-Bugs-To: \n"')
-    # TODO put today's date
-    outfile.puts('"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"')
-    # TODO if it is no POT file, put today's date
-    outfile.puts('"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"')
+    current_time = Time.now.strftime("%Y-%m-%-d %H:%M%z")
+    outfile.puts("\"POT-Creation-Date: #{current_time}\\n\"")
+    if lang == 'LANGUAGE'
+        outfile.puts('"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"')
+    else
+        outfile.puts("\"PO-Revision-Date: #{current_time}\\n\"")
+    end
     outfile.puts('"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"')
     outfile.puts('"Language-Team: ' + lang + ' <LL@li.org>\n"')
     outfile.puts('"MIME-Version: 1.0\n"')
