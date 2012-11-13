@@ -90,7 +90,11 @@ def print_header(lang='LANGUAGE', outfile=$stdout)
         outfile.puts("\"PO-Revision-Date: #{current_time}\\n\"")
     end
     outfile.puts('"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"')
-    outfile.puts('"Language-Team: ' + lang + ' <LL@li.org>\n"')
+    if lang == 'LANGUAGE'
+        outfile.puts("\"Language-Team: #{lang} <LL@li.org>\\n\"")
+    else
+        outfile.puts("\"Language-Team: #{lang} <#{lang}@li.org>\\n\"")
+    end
     outfile.puts('"MIME-Version: 1.0\n"')
     outfile.puts('"Content-Type: text/plain; charset=UTF-8\n"')
     outfile.puts('"Content-Transfer-Encoding: 8bit\n"')
