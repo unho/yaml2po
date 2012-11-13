@@ -100,7 +100,7 @@ def generate_pot(sourcefile, outfilename)
     if File.exists? engfile
         eng = YAML::load_file(engfile)
         outfile = File.new(outfilename, "w")
-        print_header('', outfile)
+        print_header('LANGUAGE', outfile)
         iterate(eng['en'], {}, '', outfile)
         outfile.close()
     else
