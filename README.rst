@@ -1,13 +1,14 @@
-yaml2po
-=======
+yaml2po and po2yaml
+===================
 
-Script for converting .yml or .yaml translation files to Gettext PO or POT
+yaml2po: script for converting .yml or .yaml translation files to Gettext PO or POT
+po2yaml: script for converting to Gettext PO to .yml or .yaml translation files
 
-Developed from the homonymous script found in http://git.openstreetmap.org/rails.git/tree/HEAD:/script/locale
+Developed from the homonymous scripts found in http://git.openstreetmap.org/rails.git/tree/HEAD:/script/locale
 
 
-Usage mode
-----------
+yaml2po usage mode
+------------------
 
 * Create a 'master' .pot file from source english translation
     yaml2po -P en.yml file.pot
@@ -20,6 +21,12 @@ Usage mode
     -l option indicates the language code in the YAML translation file
     
     -t option indicates the template YAML file (the english translation one)
+
+
+po2yaml usage mode
+------------------
+* Create a language's yaml from a given po file
+    po2yaml de.po de.yml
 
 License
 -------
