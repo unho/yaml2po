@@ -103,8 +103,7 @@ def print_header(lang='LANGUAGE', outfile=$stdout)
 end
 
 
-def generate_pot(sourcefile, outfilename)
-    engfile = LOCALE_DIR+sourcefile
+def generate_pot(engfile, outfilename)
     if File.exists? engfile
         eng = YAML::load_file(engfile)
         outfile = File.new(outfilename, "w")
@@ -117,10 +116,8 @@ def generate_pot(sourcefile, outfilename)
 end
 
 
-def lang2po(lang, sourcefile, langfile, outfilename)
-    engfile = LOCALE_DIR+sourcefile
+def lang2po(lang, engfile, infile, outfilename)
     if File.exists? engfile
-        infile = LOCALE_DIR+langfile
         if File.exists? infile
             # Generate the PO file only once checked that both files exist
             eng = YAML::load_file(engfile)
@@ -155,13 +152,13 @@ opt = ARGV[0]
 if opt == '-P'
     # Goes this way when generating a POT file
     if (ARGV.size == 3)
-        generate_pot(ARGV[1], LOCALE_DIR+ARGV[2])
+        generate_pot(LOCALE_DIR+ARGV[1], LOCALE_DIR+ARGV[2])
         exit
     end
 elsif opt == '-l'
     # Goes this way when generating a PO file with the translation for a given language
     if (ARGV.size == 6)
-        lang2po(ARGV[1], ARGV[3], ARGV[4], LOCALE_DIR+ARGV[5])
+        lang2po(ARGV[1], LOCALE_DIR+ARGV[3], LOCALE_DIR+ARGV[4], LOCALE_DIR+ARGV[5])
         exit
     end
 end
