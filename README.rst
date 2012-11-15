@@ -12,13 +12,13 @@ Developed from the homonymous scripts found in http://git.openstreetmap.org/rail
 yaml2po usage mode
 ------------------
 
-* Create a 'master' .pot file from source english translation ::
+*   Create a 'master' .pot file from source english translation ::
 
 		yaml2po -P en.yml file.pot
 
     -P option indicates the template YAML file (the english translation one)
 
-* Create a language's .po from specified existing translation ::
+*   Create a language's .po from specified existing translation ::
 
 		yaml2po -l de -t en.yml de.yml de.po
 
