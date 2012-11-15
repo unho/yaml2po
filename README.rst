@@ -14,15 +14,15 @@ yaml2po usage mode
 
         yaml2po -P en.yml file.pot
     
-    * -P option indicates the template YAML file (the english translation one)
+    -P option indicates the template YAML file (the english translation one)
 
 * Create a language's .po from specified existing translation
 
         yaml2po -l de -t en.yml de.yml de.po
     
-    * -l option indicates the language code in the YAML translation file
+    -l option indicates the language code in the YAML translation file
     
-    * -t option indicates the template YAML file (the english translation one)
+    -t option indicates the template YAML file (the english translation one)
 
 
 po2yaml usage mode
