@@ -23,7 +23,7 @@ yaml2po usage mode
 		yaml2po -l de -t en.yml de.yml de.po
 
     -l option indicates the language code in the YAML translation file
-	-t option indicates the template YAML file (the english translation one)
+    -t option indicates the template YAML file (the english translation one)
 
 
 po2yaml usage mode
