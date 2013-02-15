@@ -109,7 +109,7 @@ def generate_pot(engfile, outfilename)
         iterate(eng['en'], {}, '', outfile)
         outfile.close()
     else
-        $stderr.puts("\nError: Specified YAML file \"#{sourcefile}\" does not exist.\n\n")
+        $stderr.puts("\nError: Specified YAML file \"#{engfile}\" does not exist.\n\n")
     end
 end
 
@@ -129,7 +129,7 @@ def lang2po(lang, engfile, infile, outfilename)
             $stderr.puts("\nError: Specified YAML file \"#{infile}\" does not exist.\n\n")
         end
     else
-        $stderr.puts("\nError: Specified YAML file \"#{sourcefile}\" does not exist.\n\n")
+        $stderr.puts("\nError: Specified YAML file \"#{engfile}\" does not exist.\n\n")
     end
 end
 
