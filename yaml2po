@@ -101,35 +101,34 @@ def print_header(lang='LANGUAGE', outfile=$stdout)
 end
 
 
-def generate_pot(engfile, outfilename)
-    if File.exists? engfile
-        eng = YAML::load_file(engfile)
+def generate_pot(engfilename, outfilename)
+    if File.exists? engfilename
+        engfile = YAML::load_file(engfilename)
         outfile = File.new(outfilename, "w")
         print_header('LANGUAGE', outfile)
-        iterate(eng['en'], {}, '', outfile)
+        iterate(engfile['en'], {}, '', outfile)
         outfile.close()
     else
-        $stderr.puts("\nError: Specified YAML file \"#{engfile}\" does not exist.\n\n")
+        $stderr.puts("\nError: Specified YAML file \"#{engfilename}\" does not exist.\n\n")
     end
 end
 
 
-def lang2po(lang, engfile, infile, outfilename)
-    if File.exists? engfile
-        if File.exists? infile
+def lang2po(lang, engfilename, langfilename, outfilename)
+    if File.exists? engfilename
+        if File.exists? langfilename
             # Generate the PO file only once checked that both files exist
-            eng = YAML::load_file(engfile)
-            oth = YAML::load_file(infile)
-            oth = oth[lang]
+            engfile = YAML::load_file(engfilename)
+            langfile = YAML::load_file(langfilename)
             outfile = File.new(outfilename, "w")
             print_header(lang, outfile)
-            iterate(eng['en'], oth, '', outfile)
+            iterate(engfile['en'], langfile[lang], '', outfile)
             outfile.close()
         else
-            $stderr.puts("\nError: Specified YAML file \"#{infile}\" does not exist.\n\n")
+            $stderr.puts("\nError: Specified YAML file \"#{langfilename}\" does not exist.\n\n")
         end
     else
-        $stderr.puts("\nError: Specified YAML file \"#{engfile}\" does not exist.\n\n")
+        $stderr.puts("\nError: Specified YAML file \"#{engfilename}\" does not exist.\n\n")
     end
 end
 
