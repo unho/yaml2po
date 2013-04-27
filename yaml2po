@@ -55,6 +55,8 @@ def iterate(hash, fhash={}, path='', outfile=$stdout)
         if val.is_a? Hash
             fhash[key] = {} unless fhash[key].is_a? Hash
             iterate(val, fhash[key], path+key+':', outfile)
+        elsif val.nil?
+            puts("Empty key:   #{path}#{key}")
         else
             outfile.puts("")
             outfile.puts("msgctxt \"#{path}#{key}\"")
