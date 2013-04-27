@@ -51,18 +51,18 @@ end
 def iterate(hash, fhash={}, path='', outfile=$stdout)
     postr = ''
     hash.each {|key, val|
-    fhash[key] = {} unless fhash.has_key? key
-    if val.is_a? Hash
-        fhash[key] = {} unless fhash[key].is_a? Hash
-        iterate(val, fhash[key], path+key+':', outfile)
-    else
-        outfile.puts("")
-        outfile.puts("msgctxt \"#{path}#{key}\"")
-        new_source = process_msgid_msgstr(val)
-        outfile.puts("msgid \"#{new_source}\"")
-        new_translation = process_msgid_msgstr(fhash[key])
-        outfile.puts("msgstr \"#{new_translation}\"")
-    end
+        fhash[key] = {} unless fhash.has_key? key
+        if val.is_a? Hash
+            fhash[key] = {} unless fhash[key].is_a? Hash
+            iterate(val, fhash[key], path+key+':', outfile)
+        else
+            outfile.puts("")
+            outfile.puts("msgctxt \"#{path}#{key}\"")
+            new_source = process_msgid_msgstr(val)
+            outfile.puts("msgid \"#{new_source}\"")
+            new_translation = process_msgid_msgstr(fhash[key])
+            outfile.puts("msgstr \"#{new_translation}\"")
+        end
     }
 end
 
