@@ -47,7 +47,6 @@ def process_msgid_msgstr(string)
         new_string = string.gsub("\"", "\\\"")
         new_string = new_string.gsub("\n", "\"\n\"")
 	new_string = new_string.gsub("\t", "\"\t\"")
-	#new_string = new_string.gsub(/:/, '&#58;')
     end
     return new_string
 end
@@ -74,6 +73,7 @@ def iterate(hash, fhash={}, path='', outfile=$stdout, keepmsgctxt)
     }
 end
 
+# used for converting a yaml file that contains two languages.
 def mixediterate(fhash={}, path='', outfile=$stdout, keepmsgctxt)
     postr = ''
     fhash.each {|key, val|
@@ -142,6 +142,7 @@ def generate_pot(engfilename, outfilename)
     end
 end
 
+# could be refactored a bit more. Just a repeat of what you already have.
 def mixedlang2po(lang,langfilename, outfilename, enginetype, keepmsgctxt)
     if File.exists? langfilename
         YAML::ENGINE.yamler = enginetype
