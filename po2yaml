@@ -50,11 +50,13 @@ def po2hash(f)
     msgstr = ''
     f.each_line { |line|
         line.strip!
-        if line[0..8] == 'msgctxt "'
-            path = line[9..-2].split(':')
+	line.gsub!(/\\/,'')
+        if line[0..6] == 'msgid "'
+            path = line[7..-2].split(":")
         elsif line[0..7] == 'msgstr "'
             # TODO convert escaped characters
             msgstr = line[8..-2]
+            puts(msgstr)
         end
 
         if !path.empty? and !msgstr.empty?
@@ -73,7 +75,7 @@ def generate_yaml(filename, outfilename)
         # The following line expects the files to be named like "de.po" and therefore the language code can be recovered by substracting the '.po' suffix
         # TODO refactor in order to extract the language code when the file is not just named like "LANG.po", but like "SOMETHING.LANG.po"
         # TODO refactor in order to request the language code in case it can't be extracted from the filename
-        langcode = File.basename(filename, '.po')
+        langcode = 'ja'
         tr = {langcode => po2hash(pofile)}
         outfile = File.new(outfilename, "w")
         outfile.puts(tr.to_yaml)
