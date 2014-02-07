@@ -13,6 +13,8 @@
 # Copyright (C) 2009 Thomas Wood
 # Copyright (C) 2009 Tom Hughes
 #
+# Contributors: MNelson30 
+#
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
@@ -29,7 +31,6 @@
 
 require "yaml"
 
-
 def add_translation(hash, keys, value)
     key = keys.shift
     if keys.empty?
@@ -43,18 +44,20 @@ def add_translation(hash, keys, value)
     hash
 end
 
-
+# Builds yaml file when a po without a context msg. TODO: option to allow it.
 def po2hash(f)
     trs = {}
     path = []
     msgstr = ''
     f.each_line { |line|
         line.strip!
-        if line[0..8] == 'msgctxt "'
-            path = line[9..-2].split(':')
+	line.gsub!(/\\/,'')
+        if line[0..6] == 'msgid "'
+            path = line[7..-2].split(":")
         elsif line[0..7] == 'msgstr "'
             # TODO convert escaped characters
             msgstr = line[8..-2]
+            puts(msgstr)
         end
 
         if !path.empty? and !msgstr.empty?
@@ -66,14 +69,13 @@ def po2hash(f)
     trs
 end
 
-
-def generate_yaml(filename, outfilename)
+def generate_yaml(filename, outfilename, langtype)
     if File.exists? filename
         pofile = File.open(filename, "r")
         # The following line expects the files to be named like "de.po" and therefore the language code can be recovered by substracting the '.po' suffix
         # TODO refactor in order to extract the language code when the file is not just named like "LANG.po", but like "SOMETHING.LANG.po"
         # TODO refactor in order to request the language code in case it can't be extracted from the filename
-        langcode = File.basename(filename, '.po')
+        langcode = langtype
         tr = {langcode => po2hash(pofile)}
         outfile = File.new(outfilename, "w")
         outfile.puts(tr.to_yaml)
@@ -83,21 +85,16 @@ def generate_yaml(filename, outfilename)
     end
 end
 
-
 def print_usage()
     puts("\nUsage:\n")
     puts("  - To create a language's yaml from a given po file\n")
-    puts("    po2yaml de.po de.yml\n\n")
+    puts("    po2yaml ja.po ja.yml ja\n\n")
 end
 
-
-
-if ARGV.size == 2
-    generate_yaml(ARGV[0], ARGV[1])
+# ARGV[2] is for the language type in header
+if ARGV.size == 3
+    generate_yaml(ARGV[0], ARGV[1] ARGV[2])
     exit
 end
 
 print_usage()
-
-
-

@@ -12,10 +12,16 @@
 #  - To create a language's .po
 #    yaml2po -l de -t en.yml de.yml > de.po
 #
+#  - To create mixed language's .po\n")
+#    yaml2po -l ja -t ja.yml ja.po enginetype keepmsgctxt
+#    -enginetype = 'psych' / 'syck'
+#    -keepmsgctxt = true: 1 / false: 0
 #
 # Copyright (C) 2012 Leandro Regueiro <leandro.regueiro AT gmail DOT com>
 # Copyright (C) 2009 Thomas Wood
 # Copyright (C) 2009 Tom Hughes
+#
+# Contributors: MNelson30 
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -35,7 +41,6 @@ require "yaml"
 require "optparse"
 require "time"
 
-
 def process_msgid_msgstr(string)
     # Escape the " characters and correctly output multiline strings both in msgid and msgstr
     if string.is_a? Hash
@@ -43,12 +48,12 @@ def process_msgid_msgstr(string)
     else
         new_string = string.gsub("\"", "\\\"")
         new_string = new_string.gsub("\n", "\"\n\"")
+	new_string = new_string.gsub("\t", "\"\t\"")
     end
     return new_string
 end
 
-
-def iterate(hash, fhash={}, path='', outfile=$stdout)
+def iterate(hash, fhash={}, path='', outfile=$stdout, keepmsgctxt)
     postr = ''
     hash.each {|key, val|
         fhash[key] = {} unless fhash.has_key? key
@@ -59,7 +64,9 @@ def iterate(hash, fhash={}, path='', outfile=$stdout)
             puts("Empty key:   #{path}#{key}")
         else
             outfile.puts("")
-            outfile.puts("msgctxt \"#{path}#{key}\"")
+            if keepmsgctxt == 1
+                outfile.puts("msgctxt \"#{path}#{key}\"")
+	    end
             new_source = process_msgid_msgstr(val)
             outfile.puts("msgid \"#{new_source}\"")
             new_translation = process_msgid_msgstr(fhash[key])
@@ -68,6 +75,28 @@ def iterate(hash, fhash={}, path='', outfile=$stdout)
     }
 end
 
+# used for converting a yaml file that contains two languages.
+def mixediterate(fhash={}, path='', outfile=$stdout, keepmsgctxt)
+    postr = ''
+    fhash.each {|key, val|
+        fhash[key] = {} unless fhash.has_key? key
+        if val.is_a? Hash
+            fhash[key] = {} unless fhash[key].is_a? Hash
+            mixediterateiterate(val, fhash[key], path+key+':', outfile)
+        elsif val.nil?
+            puts("Empty key:   #{path}#{key}")
+        else
+            outfile.puts("")
+	    if keepmsgctxt == 1
+                outfile.puts("msgctxt \"#{path}#{key}\"")
+	    end
+ 	    new_source = process_msgid_msgstr(key)
+            outfile.puts("msgid \"#{new_source}\"")
+            new_translation = process_msgid_msgstr(val)
+            outfile.puts("msgstr \"#{new_translation}\"")
+        end
+    }
+end
 
 def print_header(lang='LANGUAGE', outfile=$stdout)
     outfile.puts('# SOME DESCRIPTIVE TITLE.')
@@ -102,7 +131,6 @@ def print_header(lang='LANGUAGE', outfile=$stdout)
     outfile.puts('"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"')
 end
 
-
 def generate_pot(engfilename, outfilename)
     if File.exists? engfilename
         engfile = YAML::load_file(engfilename)
@@ -115,16 +143,30 @@ def generate_pot(engfilename, outfilename)
     end
 end
 
+# could be refactored a bit more. Just a repeat of what you already have.
+def mixedlang2po(lang,langfilename, outfilename, enginetype, keepmsgctxt)
+    if File.exists? langfilename
+        YAML::ENGINE.yamler = enginetype
+        langfile = YAML::load_file(langfilename)
+    	outfile = File.new(outfilename, "w")
+    	print_header(lang, outfile)
+    	mixediterate(langfile, '', outfile, keepmsgctxt)
+    	outfile.close()
+    else 
+        $stderr.puts("\nError: Specified YAML file \"#{langfilename}\" does not exist.\n\n")
+    end
+end
 
-def lang2po(lang, engfilename, langfilename, outfilename)
+def lang2po(lang, engfilename, langfilename, outfilename, enginetype, keepmsgctxt)
     if File.exists? engfilename
         if File.exists? langfilename
+	    YAML::ENGINE.yamler = enginetype
             # Generate the PO file only once checked that both files exist
             engfile = YAML::load_file(engfilename)
             langfile = YAML::load_file(langfilename)
             outfile = File.new(outfilename, "w")
             print_header(lang, outfile)
-            iterate(engfile['en'], langfile[lang], '', outfile)
+            iterate(engfile['en'], langfile[lang], '', outfile, keepmsgctxt)
             outfile.close()
         else
             $stderr.puts("\nError: Specified YAML file \"#{langfilename}\" does not exist.\n\n")
@@ -134,17 +176,19 @@ def lang2po(lang, engfilename, langfilename, outfilename)
     end
 end
 
-
 def print_usage()
     puts("\nUsage:\n")
     puts("  - To create a 'master' .pot\n")
     puts("    yaml2po -P en.yml file.pot\n")
     puts("\n")
     puts("  - To create a language's .po\n")
-    puts("    yaml2po -l de -t en.yml de.yml de.po\n\n")
+    puts("    yaml2po -l de -t en.yml de.yml de.po enginetype keepmsgctxt\n\n")
+    puts("\n")
+    puts("  - To create a language's .po\n")
+    puts("    yaml2po -l ja -t ja.yml ja.po enginetype keepmsgctxt\n\n")
+    puts("    # enginetype = 'psych' / 'syck' \n")
+    puts("    # keepmsgctxt = true: 1 / false: 0 \n\n")
 end
-
-
 
 opt = ARGV[0]
 
@@ -156,13 +200,13 @@ if opt == '-P'
     end
 elsif opt == '-l'
     # Goes this way when generating a PO file with the translation for a given language
-    if (ARGV.size == 6)
-        lang2po(ARGV[1], ARGV[3], ARGV[4], ARGV[5])
+    if (ARGV.size == 8)
+        lang2po(ARGV[1], ARGV[3], ARGV[4], ARGV[5], ARGV[6], ARGV[7])
         exit
     end
+    # Goes this way when generating a PO file in mixed language mode.
+    if (ARGV.size == 7)
+        mixedlang2po(ARGV[2], ARGV[3], ARGV[4], ARGV[5], ARGV[6])
+    end
 end
-
 print_usage()
-
-
-
