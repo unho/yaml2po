@@ -21,6 +21,8 @@
 # Copyright (C) 2009 Thomas Wood
 # Copyright (C) 2009 Tom Hughes
 #
+# Contributors: MNelson30 
+#
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
@@ -96,7 +98,6 @@ def mixediterate(fhash={}, path='', outfile=$stdout, keepmsgctxt)
     }
 end
 
-
 def print_header(lang='LANGUAGE', outfile=$stdout)
     outfile.puts('# SOME DESCRIPTIVE TITLE.')
     outfile.puts('# Copyright (C) YEAR THE PACKAGE\'S COPYRIGHT HOLDER')
@@ -151,9 +152,9 @@ def mixedlang2po(lang,langfilename, outfilename, enginetype, keepmsgctxt)
     	print_header(lang, outfile)
     	mixediterate(langfile, '', outfile, keepmsgctxt)
     	outfile.close()
-     else 
-	$stderr.puts("\nError: Specified YAML file \"#{langfilename}\" does not exist.\n\n")
-     end
+    else 
+        $stderr.puts("\nError: Specified YAML file \"#{langfilename}\" does not exist.\n\n")
+    end
 end
 
 def lang2po(lang, engfilename, langfilename, outfilename, enginetype, keepmsgctxt)
@@ -174,9 +175,6 @@ def lang2po(lang, engfilename, langfilename, outfilename, enginetype, keepmsgctx
         $stderr.puts("\nError: Specified YAML file \"#{engfilename}\" does not exist.\n\n")
     end
 end
-
-
-
 
 def print_usage()
     puts("\nUsage:\n")
